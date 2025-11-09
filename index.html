@@ -1,46 +1,246 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App CBD Bien-Être</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f0f8f0; color: #333; }
-        h1 { color: #228B22; text-align: center; }
-        button { background: #32CD32; color: white; border: none; padding: 15px; font-size: 18px; border-radius: 10px; width: 100%; margin: 10px 0; }
-        button:hover { background: #228B22; }
-        #status { text-align: center; color: #666; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBD Boutique – Mini‑App</title>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root { --bg:#f0f8f0; --txt:#333; --accent:#228B22; }
+    [data-theme="dark"] { --bg:#1a1a1a; --txt:#fff; --accent:#32CD32; }
+
+    body {margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:Arial,Helvetica,sans-serif;}
+    header {background:var(--accent);color:#fff;padding:1rem;text-align:center;}
+    .container {max-width:480px;margin:auto;padding:1rem;}
+    
+    .product {
+      border:1px solid #ddd;border-radius:12px;margin:1rem 0;padding:1rem;
+      background:#fff;position:relative;overflow:hidden;
+    }
+    [data-theme="dark"] .product {background:#2a2a2a;border-color:#444;}
+
+    .media-wrapper {
+      position:relative;width:100%;height:200px;margin-bottom:1rem;
+      border-radius:8px;overflow:hidden;cursor:pointer;
+    }
+    .media-wrapper img, .media-wrapper video {
+      width:100%;height:100%;object-fit:cover;
+    }
+    .play-icon {
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      font-size:3rem;color:#fff;opacity:0.8;
+      pointer-events:none;
+    }
+
+    .product h3 {margin:0 0 .5rem;font-size:1.2rem;color:var(--accent);}
+    .price {font-weight:bold;font-size:1.1rem;color:#e91e63;}
+    .desc {font-size:.9rem;margin:.5rem 0;line-height:1.4;}
+    .add {
+      background:var(--accent);color:#fff;border:none;padding:.6rem 1rem;
+      border-radius:6px;font-size:1rem;cursor:pointer;width:100%;
+    }
+    .add:hover {opacity:.9;}
+
+    #cart {margin-top:1.5rem;padding:1rem;background:#fff;border-radius:12px;}
+    [data-theme="dark"] #cart {background:#2a2a2a;}
+    #cart ul {list-style:none;padding:0;margin:0;}
+    #cart li {display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #eee;}
+    #cart .total {font-weight:bold;margin-top:.5rem;}
+    #checkoutBtn {
+      width:100%;margin-top:1rem;padding:.8rem;background:#ff9800;
+      color:#fff;border:none;border-radius:6px;font-size:1.1rem;cursor:pointer;
+    }
+    #checkoutBtn:disabled {background:#ccc;cursor:not-allowed;}
+  </style>
 </head>
 <body>
-    <h1>🌿 Boutique CBD Bien-Être</h1>
-    <p>Découvre nos produits naturels à base de CBD pour un quotidien zen. Sélectionne un produit pour commander !</p>
-    
-    <button onclick="commanderProduit()">🛒 Commander Huile CBD 10% (20€)</button>
-    <p id="status"></p>
+  <header>
+    <h1>CBD Bien‑Être</h1>
+    <p>Produits naturels – Clique sur l’image pour voir la vidéo</p>
+  </header>
 
-    <script>
-        // Initialise Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.ready();  // Prêt à l'affichage
-        tg.expand(); // Plein écran
+  <div class="container" id="products"></div>
 
-        // Adapte au thème Telegram (clair/sombre)
-        if (tg.colorScheme === 'dark') {
-            document.body.style.backgroundColor = '#1a1a1a';
-            document.body.style.color = '#fff';
-        }
+  <div class="container" id="cart">
+    <h2>Panier</h2>
+    <ul id="cartItems"></ul>
+    <div class="total" id="totalPrice">Total : 0 €</div>
+    <button id="checkoutBtn" disabled>Valider la commande</button>
+  </div>
 
-        function commanderProduit() {
-            const data = { produit: 'Huile CBD 10%', prix: 20, quantite: 1 };  // Données JSON à envoyer
-            tg.sendData(JSON.stringify(data));  // Envoie au bot
-            document.getElementById('status').innerText = 'Commande envoyée ! Vérifie ton chat. 😊';
-        }
+  <script>
+    // ========================================
+    // 1. Telegram WebApp Init
+    // ========================================
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+    if (tg.colorScheme === 'dark') document.documentElement.dataset.theme = 'dark';
 
-        // Bouton de fermeture (optionnel)
-        tg.MainButton.setText('Fermer').onClick(() => tg.close());
-        tg.MainButton.show();
-    </script>
+    // ========================================
+    // 2. Catalogue avec image + vidéo
+    // ========================================
+    const catalogue = [
+      {
+        id: 1,
+        name: "Huile CBD 10 %",
+        desc: "Huile sublinguale full‑spectrum, 10 % CBD, 10 ml. Idéale pour la détente.",
+        price: 29.90,
+        img: "https://images.unsplash.com/photo-1635321593232-297c6dd0fc76?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        videoPoster: "https://images.unsplash.com/photo-1635321593232-297c6dd0fc76?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 2,
+        name: "Fleurs CBD Amnesia",
+        desc: "Fleurs séchées premium, THC < 0,2 %. Arôme citronné, effet relaxant.",
+        price: 8.50,
+        unit: "g",
+        img: "https://images.unsplash.com/photo-1628771065518-0d82f1938462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        videoPoster: "https://images.unsplash.com/photo-1628771065518-0d82f1938462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 3,
+        name: "Gélules CBD 25 mg",
+        desc: "Boîte de 30 gélules, 25 mg CBD. Prise facile, dosage précis.",
+        price: 34.00,
+        img: "https://images.unsplash.com/photo-1584308661627-7892d85ac4c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        videoPoster: "https://images.unsplash.com/photo-1584308661627-7892d85ac4c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 4,
+        name: "Résine CBD Hash 20 %",
+        desc: "Résine pressée à froid, 20 % CBD. Texture souple, goût boisé.",
+        price: 12.00,
+        unit: "g",
+        img: "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        videoPoster: "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      }
+    ];
+
+    // ========================================
+    // 3. Panier
+    // ========================================
+    let cart = [];
+
+    // ========================================
+    // 4. Rendu des produits
+    // ========================================
+    const productsDiv = document.getElementById('products');
+    catalogue.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'product';
+      div.innerHTML = `
+        <div class="media-wrapper" data-id="${p.id}">
+          <img src="${p.img}" alt="${p.name}" class="media-img">
+          <video class="media-video" poster="${p.videoPoster}" preload="none" loop muted playsinline>
+            <source src="${p.video}" type="video/mp4">
+          </video>
+          <div class="play-icon">▶</div>
+        </div>
+        <h3>${p.name}</h3>
+        <p class="desc">${p.desc}</p>
+        <p class="price">${p.price.toFixed(2)} € ${p.unit ? `/ ${p.unit}` : ''}</p>
+        <button class="add" data-id="${p.id}">Ajouter au panier</button>
+      `;
+      productsDiv.appendChild(div);
+    });
+
+    // ========================================
+    // 5. Gestion Image ↔ Vidéo
+    // ========================================
+    productsDiv.addEventListener('click', e => {
+      const wrapper = e.target.closest('.media-wrapper');
+      if (!wrapper) return;
+
+      const img = wrapper.querySelector('.media-img');
+      const video = wrapper.querySelector('.media-video');
+      const playIcon = wrapper.querySelector('.play-icon');
+
+      if (e.target.closest('button')) return; // ignorer le bouton "ajouter"
+
+      if (img.style.display !== 'none') {
+        // Passer à la vidéo
+        img.style.display = 'none';
+        video.style.display = 'block';
+        playIcon.style.display = 'none';
+        video.play().catch(() => {});
+      } else {
+        // Revenir à l’image
+        video.pause();
+        video.currentTime = 0;
+        video.style.display = 'none';
+        img.style.display = 'block';
+        playIcon.style.display = 'block';
+      }
+    });
+
+    // ========================================
+    // 6. Panier
+    // ========================================
+    function updateCartUI() {
+      const itemsEl = document.getElementById('cartItems');
+      itemsEl.innerHTML = '';
+      let total = 0;
+
+      cart.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${item.qty} × ${item.name}</span><span>${(item.price * item.qty).toFixed(2)} €</span>`;
+        itemsEl.appendChild(li);
+        total += item.price * item.qty;
+      });
+
+      document.getElementById('totalPrice').textContent = `Total : ${total.toFixed(2)} €`;
+      document.getElementById('checkoutBtn').disabled = cart.length === 0;
+    }
+
+    productsDiv.addEventListener('click', e => {
+      if (!e.target.classList.contains('add')) return;
+      const id = Number(e.target.dataset.id);
+      const prod = catalogue.find(p => p.id === id);
+      const existing = cart.find(i => i.id === id);
+
+      if (existing) existing.qty++;
+      else cart.push({id: prod.id, name: prod.name, price: prod.price, qty: 1, unit: prod.unit});
+
+      updateCartUI();
+    });
+
+    // ========================================
+    // 7. Validation → envoi au bot
+    // ========================================
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+      if (cart.length === 0) return;
+
+      const order = {
+        items: cart.map(i => ({
+          name: i.name,
+          qty: i.qty,
+          price: i.price,
+          unit: i.unit || null
+        })),
+        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0).toFixed(2)
+      };
+
+      tg.sendData(JSON.stringify(order));
+      tg.MainButton.setText('Commande envoyée !').show();
+      setTimeout(() => tg.close(), 1500);
+    });
+
+    // ========================================
+    // 8. Bouton principal
+    // ========================================
+    tg.MainButton.setText('Voir le panier')
+                .onClick(() => document.getElementById('cart').scrollIntoView({behavior:'smooth'}))
+                .show();
+
+    updateCartUI();
+  </script>
 </body>
 </html>
