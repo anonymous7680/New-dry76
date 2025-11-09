@@ -3,34 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CBD Boutique – Mini‑App</title>
+  <title>Dry.Coffee76 – Boutique</title>
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    :root { --bg:#f0f8f0; --txt:#333; --accent:#228B22; }
-    [data-theme="dark"] { --bg:#1a1a1a; --txt:#fff; --accent:#32CD32; }
+    :root {
+      --bg:#121212;
+      --surface:#1e1e1e;
+      --text:#e0e0e0;
+      --accent:#ff6d00;     /* Orange vif */
+      --accent-light:#ff8a50;
+      --border:#333;
+    }
 
-    body {margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:Arial,Helvetica,sans-serif;}
-    header {background:var(--accent);color:#fff;padding:1rem;text-align:center;position:relative;}
-    .back-btn {position:absolute;left:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;}
+    body {
+      margin:0;padding:0;
+      background:var(--bg);color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    header {
+      background:var(--surface);padding:1rem;
+      text-align:center;position:relative;
+      border-bottom:1px solid var(--border);
+    }
+    .back-btn {
+      position:absolute;left:1rem;top:50%;transform:translateY(-50%);
+      background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;
+    }
+
     .container {max-width:480px;margin:auto;padding:1rem;}
 
-    /* Page Liste */
+    /* === PAGE LISTE === */
     #listPage .grid {
       display:grid;grid-template-columns:1fr 1fr;gap:1rem;
     }
     .card {
-      background:#fff;border-radius:12px;overflow:hidden;cursor:pointer;
-      box-shadow:0 2px 6px rgba(0,0,0,.1);text-align:center;
+      background:var(--surface);border-radius:12px;overflow:hidden;
+      cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);
+      text-align:center;transition:transform .2s;
     }
-    [data-theme="dark"] .card {background:#2a2a2a;box-shadow:0 2px 6px rgba(0,0,0,.3);}
-    .card img {width:100%;height:140px;object-fit:cover;}
+    .card:hover {transform:scale(1.03);}
+    .card img {width:100%;height:130px;object-fit:cover;}
     .card h3 {margin:0.5rem 0.5rem 0.3rem;font-size:1rem;color:var(--accent);}
-    .card .price {font-weight:bold;color:#e91e63;margin:0 0.5rem 0.5rem;}
+    .card .price {font-weight:bold;color:#ffab40;margin:0 0.5rem 0.5rem;}
 
-    /* Page Détail */
+    /* === PAGE DÉTAIL === */
     #detailPage {display:none;}
     .media-wrapper {
       position:relative;width:100%;height:220px;margin-bottom:1rem;
@@ -39,33 +59,42 @@
     .media-wrapper img, .media-wrapper video {
       width:100%;height:100%;object-fit:cover;
     }
-    .play-icon {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:#fff;opacity:0.8;pointer-events:none;}
-    .detail-desc {font-size:0.95rem;line-height:1.5;margin:1rem 0;}
-    .detail-price {font-size:1.3rem;font-weight:bold;color:#e91e63;margin:0.5rem 0;}
+    .play-icon {
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      font-size:3rem;color:#fff;opacity:0.8;pointer-events:none;
+    }
+    .detail-desc {font-size:0.95rem;line-height:1.5;margin:1rem 0;color:#ccc;}
+    .detail-price {font-size:1.3rem;font-weight:bold;color:var(--accent-light);margin:0.5rem 0;}
     .add-detail {
       background:var(--accent);color:#fff;border:none;padding:0.8rem;
       border-radius:8px;font-size:1.1rem;cursor:pointer;width:100%;
     }
 
-    /* Panier */
-    #cart {margin-top:1.5rem;padding:1rem;background:#fff;border-radius:12px;}
-    [data-theme="dark"] #cart {background:#2a2a2a;}
-    #cart ul {list-style:none;padding:0;margin:0;}
-    #cart li {display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #eee;}
-    #cart .total {font-weight:bold;margin-top:.5rem;}
-    #checkoutBtn {
-      width:100%;margin-top:1rem;padding:.8rem;background:#ff9800;
-      color:#fff;border:none;border-radius:8px;font-size:1.1rem;cursor:pointer;
+    /* === PANIER === */
+    #cart {
+      margin-top:1.5rem;padding:1rem;background:var(--surface);
+      border-radius:12px;border:1px solid var(--border);
     }
-    #checkoutBtn:disabled {background:#ccc;cursor:not-allowed;}
+    #cart ul {list-style:none;padding:0;margin:0;}
+    #cart li {
+      display:flex;justify-content:space-between;padding:.4rem 0;
+      border-bottom:1px solid var(--border);color:#ccc;
+    }
+    #cart .total {font-weight:bold;margin-top:.5rem;color:var(--accent-light);}
+    #checkoutBtn {
+      width:100%;margin-top:1rem;padding:.8rem;
+      background:var(--accent-light);color:#000;border:none;
+      border-radius:8px;font-size:1.1rem;cursor:pointer;
+    }
+    #checkoutBtn:disabled {background:#444;color:#777;cursor:not-allowed;}
   </style>
 </head>
 <body>
   <!-- === PAGE LISTE === -->
   <div id="listPage">
     <header>
-      <h1>CBD Bien‑Être</h1>
-      <p>2 produits par ligne – Clique pour voir le détail</p>
+      <h1>Dry.Coffee76</h1>
+      <p>Produits naturels – 2 par ligne</p>
     </header>
     <div class="container">
       <div class="grid" id="productsGrid"></div>
@@ -105,24 +134,23 @@
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-    if (tg.colorScheme === 'dark') document.documentElement.dataset.theme = 'dark';
 
     // ========================================
-    // 2. Catalogue
+    // 2. Catalogue (SANS CBD)
     // ========================================
     const catalogue = [
       {
         id: 1,
-        name: "Huile CBD 10 %",
-        desc: "Huile sublinguale full‑spectrum, 10 % CBD, 10 ml. Idéale pour la détente quotidienne. Effet relaxant, sans THC psychoactif.",
+        name: "Huile 10 %",
+        desc: "Huile sublinguale full‑spectrum, 10 % extrait, 10 ml. Idéale pour la détente quotidienne. Effet relaxant, sans psychoactivité.",
         price: 29.90,
         img: "https://images.unsplash.com/photo-1635321593232-297c6dd0fc76?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
         video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
       },
       {
         id: 2,
-        name: "Fleurs CBD Amnesia",
-        desc: "Fleurs séchées premium, THC < 0,2 %. Arôme citronné intense, effet relaxant et clarifiant. Parfait en infusion ou vaporisation.",
+        name: "Fleurs Amnesia",
+        desc: "Fleurs séchées premium, THC < 0,2 %. Arôme citronné intense, effet relaxant. Parfait en infusion ou vaporisation.",
         price: 8.50,
         unit: "g",
         img: "https://images.unsplash.com/photo-1628771065518-0d82f1938462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -130,16 +158,16 @@
       },
       {
         id: 3,
-        name: "Gélules CBD 25 mg",
-        desc: "Boîte de 30 gélules, 25 mg CBD chacune. Dosage précis, absorption lente. Idéal pour un usage régulier et discret.",
+        name: "Gélules 25 mg",
+        desc: "Boîte de 30 gélules, 25 mg extrait chacune. Dosage précis, absorption lente. Idéal pour un usage régulier.",
         price: 34.00,
         img: "https://images.unsplash.com/photo-1584308661627-7892d85ac4c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+        video: "https:// |commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
       },
       {
         id: 4,
-        name: "Résine CBD Hash 20 %",
-        desc: "Résine pressée à froid, 20 % CBD. Texture souple, goût boisé et terreux. À effriter dans une infusion ou un vaporisateur.",
+        name: "Résine Hash 20 %",
+        desc: "Résine pressée à froid, 20 % extrait. Texture souple, goût boisé. À effriter dans une infusion ou un vaporisateur.",
         price: 12.00,
         unit: "g",
         img: "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -154,7 +182,7 @@
     let currentProduct = null;
 
     // ========================================
-    // 4. Rendu Grille (2 colonnes)
+    // 4. Grille 2 colonnes
     // ========================================
     const grid = document.getElementById('productsGrid');
     catalogue.forEach(p => {
@@ -170,7 +198,7 @@
     });
 
     // ========================================
-    // 5. Navigation Liste → Détail
+    // 5. Clic → Détail
     // ========================================
     grid.addEventListener('click', e => {
       const card = e.target.closest('.card');
@@ -178,7 +206,6 @@
       const id = Number(card.dataset.id);
       currentProduct = catalogue.find(p => p.id === id);
 
-      // Remplir page détail
       document.getElementById('detailTitle').textContent = currentProduct.name;
       document.getElementById('detailImg').src = currentProduct.img;
       document.getElementById('detailVideo').src = currentProduct.video;
@@ -186,7 +213,7 @@
       document.getElementById('detailPrice').textContent = 
         `${currentProduct.price.toFixed(2)} € ${currentProduct.unit ? `/ ${currentProduct.unit}` : ''}`;
 
-      // Reset media
+      // Reset média
       const video = document.getElementById('detailVideo');
       video.pause();
       video.style.display = 'none';
@@ -199,7 +226,7 @@
       tg.MainButton.hide();
     });
 
-    // Bouton retour
+    // Retour
     document.getElementById('backBtn').addEventListener('click', () => {
       document.getElementById('detailPage').style.display = 'none';
       document.getElementById('listPage').style.display = 'block';
@@ -207,7 +234,7 @@
     });
 
     // ========================================
-    // 6. Image ↔ Vidéo (détail)
+    // 6. Image ↔ Vidéo
     // ========================================
     document.getElementById('mediaWrapper').addEventListener('click', () => {
       const img = document.getElementById('detailImg');
@@ -229,7 +256,7 @@
     });
 
     // ========================================
-    // 7. Ajouter depuis détail
+    // 7. Ajouter au panier
     // ========================================
     document.getElementById('addDetailBtn').addEventListener('click', () => {
       if (!currentProduct) return;
@@ -260,7 +287,7 @@
     }
 
     // ========================================
-    // 9. Validation
+    // 9. Valider commande
     // ========================================
     document.getElementById('checkoutBtn').addEventListener('click', () => {
       if (cart.length === 0) return;
