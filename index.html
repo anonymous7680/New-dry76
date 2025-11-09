@@ -13,37 +13,41 @@
     [data-theme="dark"] { --bg:#1a1a1a; --txt:#fff; --accent:#32CD32; }
 
     body {margin:0;padding:0;background:var(--bg);color:var(--txt);font-family:Arial,Helvetica,sans-serif;}
-    header {background:var(--accent);color:#fff;padding:1rem;text-align:center;}
+    header {background:var(--accent);color:#fff;padding:1rem;text-align:center;position:relative;}
+    .back-btn {position:absolute;left:1rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;}
     .container {max-width:480px;margin:auto;padding:1rem;}
-    
-    .product {
-      border:1px solid #ddd;border-radius:12px;margin:1rem 0;padding:1rem;
-      background:#fff;position:relative;overflow:hidden;
-    }
-    [data-theme="dark"] .product {background:#2a2a2a;border-color:#444;}
 
+    /* Page Liste */
+    #listPage .grid {
+      display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+    }
+    .card {
+      background:#fff;border-radius:12px;overflow:hidden;cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,.1);text-align:center;
+    }
+    [data-theme="dark"] .card {background:#2a2a2a;box-shadow:0 2px 6px rgba(0,0,0,.3);}
+    .card img {width:100%;height:140px;object-fit:cover;}
+    .card h3 {margin:0.5rem 0.5rem 0.3rem;font-size:1rem;color:var(--accent);}
+    .card .price {font-weight:bold;color:#e91e63;margin:0 0.5rem 0.5rem;}
+
+    /* Page Détail */
+    #detailPage {display:none;}
     .media-wrapper {
-      position:relative;width:100%;height:200px;margin-bottom:1rem;
-      border-radius:8px;overflow:hidden;cursor:pointer;
+      position:relative;width:100%;height:220px;margin-bottom:1rem;
+      border-radius:12px;overflow:hidden;cursor:pointer;
     }
     .media-wrapper img, .media-wrapper video {
       width:100%;height:100%;object-fit:cover;
     }
-    .play-icon {
-      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      font-size:3rem;color:#fff;opacity:0.8;
-      pointer-events:none;
+    .play-icon {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:#fff;opacity:0.8;pointer-events:none;}
+    .detail-desc {font-size:0.95rem;line-height:1.5;margin:1rem 0;}
+    .detail-price {font-size:1.3rem;font-weight:bold;color:#e91e63;margin:0.5rem 0;}
+    .add-detail {
+      background:var(--accent);color:#fff;border:none;padding:0.8rem;
+      border-radius:8px;font-size:1.1rem;cursor:pointer;width:100%;
     }
 
-    .product h3 {margin:0 0 .5rem;font-size:1.2rem;color:var(--accent);}
-    .price {font-weight:bold;font-size:1.1rem;color:#e91e63;}
-    .desc {font-size:.9rem;margin:.5rem 0;line-height:1.4;}
-    .add {
-      background:var(--accent);color:#fff;border:none;padding:.6rem 1rem;
-      border-radius:6px;font-size:1rem;cursor:pointer;width:100%;
-    }
-    .add:hover {opacity:.9;}
-
+    /* Panier */
     #cart {margin-top:1.5rem;padding:1rem;background:#fff;border-radius:12px;}
     [data-theme="dark"] #cart {background:#2a2a2a;}
     #cart ul {list-style:none;padding:0;margin:0;}
@@ -51,19 +55,42 @@
     #cart .total {font-weight:bold;margin-top:.5rem;}
     #checkoutBtn {
       width:100%;margin-top:1rem;padding:.8rem;background:#ff9800;
-      color:#fff;border:none;border-radius:6px;font-size:1.1rem;cursor:pointer;
+      color:#fff;border:none;border-radius:8px;font-size:1.1rem;cursor:pointer;
     }
     #checkoutBtn:disabled {background:#ccc;cursor:not-allowed;}
   </style>
 </head>
 <body>
-  <header>
-    <h1>CBD Bien‑Être</h1>
-    <p>Produits naturels – Clique sur l’image pour voir la vidéo</p>
-  </header>
+  <!-- === PAGE LISTE === -->
+  <div id="listPage">
+    <header>
+      <h1>CBD Bien‑Être</h1>
+      <p>2 produits par ligne – Clique pour voir le détail</p>
+    </header>
+    <div class="container">
+      <div class="grid" id="productsGrid"></div>
+    </div>
+  </div>
 
-  <div class="container" id="products"></div>
+  <!-- === PAGE DÉTAIL === -->
+  <div id="detailPage">
+    <header>
+      <button class="back-btn" id="backBtn">Back</button>
+      <h1 id="detailTitle"></h1>
+    </header>
+    <div class="container">
+      <div class="media-wrapper" id="mediaWrapper">
+        <img id="detailImg" alt="">
+        <video id="detailVideo" preload="none" loop muted playsinline></video>
+        <div class="play-icon">Play</div>
+      </div>
+      <p class="detail-desc" id="detailDesc"></p>
+      <p class="detail-price" id="detailPrice"></p>
+      <button class="add-detail" id="addDetailBtn">Ajouter au panier</button>
+    </div>
+  </div>
 
+  <!-- === PANIER === -->
   <div class="container" id="cart">
     <h2>Panier</h2>
     <ul id="cartItems"></ul>
@@ -73,7 +100,7 @@
 
   <script>
     // ========================================
-    // 1. Telegram WebApp Init
+    // 1. Telegram WebApp
     // ========================================
     const tg = window.Telegram.WebApp;
     tg.ready();
@@ -81,46 +108,42 @@
     if (tg.colorScheme === 'dark') document.documentElement.dataset.theme = 'dark';
 
     // ========================================
-    // 2. Catalogue avec image + vidéo
+    // 2. Catalogue
     // ========================================
     const catalogue = [
       {
         id: 1,
         name: "Huile CBD 10 %",
-        desc: "Huile sublinguale full‑spectrum, 10 % CBD, 10 ml. Idéale pour la détente.",
+        desc: "Huile sublinguale full‑spectrum, 10 % CBD, 10 ml. Idéale pour la détente quotidienne. Effet relaxant, sans THC psychoactif.",
         price: 29.90,
         img: "https://images.unsplash.com/photo-1635321593232-297c6dd0fc76?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        videoPoster: "https://images.unsplash.com/photo-1635321593232-297c6dd0fc76?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
       },
       {
         id: 2,
         name: "Fleurs CBD Amnesia",
-        desc: "Fleurs séchées premium, THC < 0,2 %. Arôme citronné, effet relaxant.",
+        desc: "Fleurs séchées premium, THC < 0,2 %. Arôme citronné intense, effet relaxant et clarifiant. Parfait en infusion ou vaporisation.",
         price: 8.50,
         unit: "g",
         img: "https://images.unsplash.com/photo-1628771065518-0d82f1938462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        videoPoster: "https://images.unsplash.com/photo-1628771065518-0d82f1938462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
       },
       {
         id: 3,
         name: "Gélules CBD 25 mg",
-        desc: "Boîte de 30 gélules, 25 mg CBD. Prise facile, dosage précis.",
+        desc: "Boîte de 30 gélules, 25 mg CBD chacune. Dosage précis, absorption lente. Idéal pour un usage régulier et discret.",
         price: 34.00,
         img: "https://images.unsplash.com/photo-1584308661627-7892d85ac4c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        videoPoster: "https://images.unsplash.com/photo-1584308661627-7892d85ac4c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
       },
       {
         id: 4,
         name: "Résine CBD Hash 20 %",
-        desc: "Résine pressée à froid, 20 % CBD. Texture souple, goût boisé.",
+        desc: "Résine pressée à froid, 20 % CBD. Texture souple, goût boisé et terreux. À effriter dans une infusion ou un vaporisateur.",
         price: 12.00,
         unit: "g",
         img: "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        videoPoster: "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
       }
     ];
 
@@ -128,61 +151,97 @@
     // 3. Panier
     // ========================================
     let cart = [];
+    let currentProduct = null;
 
     // ========================================
-    // 4. Rendu des produits
+    // 4. Rendu Grille (2 colonnes)
     // ========================================
-    const productsDiv = document.getElementById('products');
+    const grid = document.getElementById('productsGrid');
     catalogue.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'product';
-      div.innerHTML = `
-        <div class="media-wrapper" data-id="${p.id}">
-          <img src="${p.img}" alt="${p.name}" class="media-img">
-          <video class="media-video" poster="${p.videoPoster}" preload="none" loop muted playsinline>
-            <source src="${p.video}" type="video/mp4">
-          </video>
-          <div class="play-icon">▶</div>
-        </div>
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.id = p.id;
+      card.innerHTML = `
+        <img src="${p.img}" alt="${p.name}">
         <h3>${p.name}</h3>
-        <p class="desc">${p.desc}</p>
         <p class="price">${p.price.toFixed(2)} € ${p.unit ? `/ ${p.unit}` : ''}</p>
-        <button class="add" data-id="${p.id}">Ajouter au panier</button>
       `;
-      productsDiv.appendChild(div);
+      grid.appendChild(card);
     });
 
     // ========================================
-    // 5. Gestion Image ↔ Vidéo
+    // 5. Navigation Liste → Détail
     // ========================================
-    productsDiv.addEventListener('click', e => {
-      const wrapper = e.target.closest('.media-wrapper');
-      if (!wrapper) return;
+    grid.addEventListener('click', e => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      const id = Number(card.dataset.id);
+      currentProduct = catalogue.find(p => p.id === id);
 
-      const img = wrapper.querySelector('.media-img');
-      const video = wrapper.querySelector('.media-video');
-      const playIcon = wrapper.querySelector('.play-icon');
+      // Remplir page détail
+      document.getElementById('detailTitle').textContent = currentProduct.name;
+      document.getElementById('detailImg').src = currentProduct.img;
+      document.getElementById('detailVideo').src = currentProduct.video;
+      document.getElementById('detailDesc').textContent = currentProduct.desc;
+      document.getElementById('detailPrice').textContent = 
+        `${currentProduct.price.toFixed(2)} € ${currentProduct.unit ? `/ ${currentProduct.unit}` : ''}`;
 
-      if (e.target.closest('button')) return; // ignorer le bouton "ajouter"
+      // Reset media
+      const video = document.getElementById('detailVideo');
+      video.pause();
+      video.style.display = 'none';
+      document.getElementById('detailImg').style.display = 'block';
+      document.querySelector('#mediaWrapper .play-icon').style.display = 'block';
+
+      // Switch page
+      document.getElementById('listPage').style.display = 'none';
+      document.getElementById('detailPage').style.display = 'block';
+      tg.MainButton.hide();
+    });
+
+    // Bouton retour
+    document.getElementById('backBtn').addEventListener('click', () => {
+      document.getElementById('detailPage').style.display = 'none';
+      document.getElementById('listPage').style.display = 'block';
+      tg.MainButton.show();
+    });
+
+    // ========================================
+    // 6. Image ↔ Vidéo (détail)
+    // ========================================
+    document.getElementById('mediaWrapper').addEventListener('click', () => {
+      const img = document.getElementById('detailImg');
+      const video = document.getElementById('detailVideo');
+      const icon = document.querySelector('#mediaWrapper .play-icon');
 
       if (img.style.display !== 'none') {
-        // Passer à la vidéo
         img.style.display = 'none';
         video.style.display = 'block';
-        playIcon.style.display = 'none';
+        icon.style.display = 'none';
         video.play().catch(() => {});
       } else {
-        // Revenir à l’image
         video.pause();
         video.currentTime = 0;
         video.style.display = 'none';
         img.style.display = 'block';
-        playIcon.style.display = 'block';
+        icon.style.display = 'block';
       }
     });
 
     // ========================================
-    // 6. Panier
+    // 7. Ajouter depuis détail
+    // ========================================
+    document.getElementById('addDetailBtn').addEventListener('click', () => {
+      if (!currentProduct) return;
+      const existing = cart.find(i => i.id === currentProduct.id);
+      if (existing) existing.qty++;
+      else cart.push({id: currentProduct.id, name: currentProduct.name, price: currentProduct.price, qty: 1, unit: currentProduct.unit});
+      updateCartUI();
+      tg.HapticFeedback.impactOccurred('light');
+    });
+
+    // ========================================
+    // 8. Panier UI
     // ========================================
     function updateCartUI() {
       const itemsEl = document.getElementById('cartItems');
@@ -200,20 +259,8 @@
       document.getElementById('checkoutBtn').disabled = cart.length === 0;
     }
 
-    productsDiv.addEventListener('click', e => {
-      if (!e.target.classList.contains('add')) return;
-      const id = Number(e.target.dataset.id);
-      const prod = catalogue.find(p => p.id === id);
-      const existing = cart.find(i => i.id === id);
-
-      if (existing) existing.qty++;
-      else cart.push({id: prod.id, name: prod.name, price: prod.price, qty: 1, unit: prod.unit});
-
-      updateCartUI();
-    });
-
     // ========================================
-    // 7. Validation → envoi au bot
+    // 9. Validation
     // ========================================
     document.getElementById('checkoutBtn').addEventListener('click', () => {
       if (cart.length === 0) return;
@@ -225,7 +272,7 @@
           price: i.price,
           unit: i.unit || null
         })),
-        total: cart.reduce((sum, i) => sum + i.price * i.qty, 0).toFixed(2)
+        total: cart.reduce((s, i) => s + i.price * i.qty, 0).toFixed(2)
       };
 
       tg.sendData(JSON.stringify(order));
@@ -234,7 +281,7 @@
     });
 
     // ========================================
-    // 8. Bouton principal
+    // 10. Bouton principal
     // ========================================
     tg.MainButton.setText('Voir le panier')
                 .onClick(() => document.getElementById('cart').scrollIntoView({behavior:'smooth'}))
