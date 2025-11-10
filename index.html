@@ -43,7 +43,14 @@
 
     .container {max-width:480px;margin:auto;padding:1rem;}
 
-    /* === PAGE LISTE === */
+    /* === LOGO === */
+    .logo {
+      width:80px;height:80px;border-radius:50%;object-fit:cover;
+      border:3px solid var(--yellow);margin:0 auto 0.5rem;display:block;
+      box-shadow:0 4px 15px rgba(255,215,0,.3);
+    }
+
+    /* === PAGE LISTE PRODUITS === */
     #listPage .grid {
       display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;
     }
@@ -53,100 +60,80 @@
       transition:transform .25s,box-shadow .25s;
       text-align:center;
     }
-    .card:hover {
-      transform:translateY(-6px);
-      box-shadow:0 8px 20px rgba(255,215,0,.15);
-    }
-    .card img {
-      width:100%;height:140px;object-fit:cover;
-      border-bottom:2px solid var(--yellow);
-    }
-    .card h3 {
-      margin:0.8rem 0.6rem 0.4rem;font-size:1.05rem;
-      color:var(--yellow);font-weight:600;
-    }
-    .card .price {
-      font-weight:bold;color:var(--yellow-light);margin:0 0.6rem 0.8rem;
-      font-size:0.95rem;
-    }
+    .card:hover {transform:translateY(-6px);box-shadow:0 8px 20px rgba(255,215,0,.15);}
+    .card img {width:100%;height:140px;object-fit:cover;border-bottom:2px solid var(--yellow);}
+    .card h3 {margin:0.8rem 0.6rem 0.4rem;font-size:1.05rem;color:var(--yellow);font-weight:600;}
+    .card .price {font-weight:bold;color:var(--yellow-light);margin:0 0.6rem 0.8rem;font-size:0.95rem;}
 
     /* === PAGE DÉTAIL === */
     #detailPage {display:none;}
     .media-wrapper {
       position:relative;width:100%;height:240px;margin-bottom:1.2rem;
-      border-radius:16px;overflow:hidden;cursor:pointer;
-      box-shadow:var(--shadow);
+      border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);
     }
-    .media-wrapper img, .media-wrapper video {
-      width:100%;height:100%;object-fit:cover;
-    }
-    .play-icon {
-      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      font-size:3.5rem;color:#fff;opacity:0.9;
-      pointer-events:none;text-shadow:0 0 10px rgba(0,0,0,.7);
-    }
-    .detail-desc {
-      font-size:0.98rem;line-height:1.6;margin:1rem 0;
-      color:#ccc;padding:0 0.2rem;
-    }
-    .detail-price {
-      font-size:1.4rem;font-weight:bold;
-      color:var(--yellow-light);margin:0.6rem 0 1rem;
-      text-shadow:0 1px 3px rgba(0,0,0,.5);
-    }
+    .media-wrapper img, .media-wrapper video {width:100%;height:100%;object-fit:cover;}
+    .play-icon {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3.5rem;color:#fff;opacity:0.9;pointer-events:none;text-shadow:0 0 10px rgba(0,0,0,.7);}
+    .detail-desc {font-size:0.98rem;line-height:1.6;margin:1rem 0;color:#ccc;}
+    .detail-price {font-size:1.4rem;font-weight:bold;color:var(--yellow-light);margin:0.6rem 0 1.5rem;text-shadow:0 1px 3px rgba(0,0,0,.5);}
 
     /* Boutons commande */
-    .btn-group {
-      display:flex;gap:1rem;margin-top:1.5rem;
-    }
-    .btn-command {
-      flex:1;padding:0.9rem 0;
-      border:none;border-radius:12px;
-      font-size:1rem;font-weight:600;
-      cursor:pointer;transition:all .2s;
-      text-align:center;text-decoration:none;
-    }
-    .btn-tg {
-      background:#28a745;color:#fff;
-    }
+    .btn-group {display:flex;gap:1rem;margin-top:1rem;}
+    .btn-command {flex:1;padding:0.9rem 0;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;text-decoration:none;}
+    .btn-tg {background:#28a745;color:#fff;}
     .btn-tg:hover {background:#218838;transform:scale(1.03);}
-    .btn-potato {
-      background:#ff6d00;color:#fff;
-    }
+    .btn-potato {background:#ff6d00;color:#fff;}
     .btn-potato:hover {background:#e65c00;transform:scale(1.03);}
 
+    /* === PAGE LIENS === */
+    #linksPage {display:none;}
+    .links-grid {
+      display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1rem;
+    }
+    .link-card {
+      background:var(--surface);border-radius:16px;padding:1.4rem;
+      text-align:center;box-shadow:var(--shadow);
+      transition:transform .2s;text-decoration:none;color:var(--text);
+    }
+    .link-card:hover {transform:scale(1.05);}
+    .link-card .label {font-weight:700;color:var(--yellow);font-size:1rem;margin-top:0.5rem;}
+    .link-card .desc {font-size:0.8rem;color:#aaa;margin-top:0.3rem;}
+
+    /* Bouton Liens */
+    .bottom-nav {text-align:center;margin:2rem 0 1rem;}
+    .btn-links {
+      background:var(--yellow);color:#000;padding:0.9rem 1.5rem;
+      border:none;border-radius:12px;font-weight:600;cursor:pointer;
+      box-shadow:0 4px 10px rgba(255,215,0,.3);transition:all .2s;
+    }
+    .btn-links:hover {background:var(--yellow-light);transform:scale(1.05);}
+
     /* Animation */
-    .fade-in {
-      animation:fadeIn .4s ease-out forwards;
-    }
-    @keyframes fadeIn {
-      from {opacity:0;transform:translateY(10px);}
-      to {opacity:1;transform:translateY(0);}
-    }
+    .fade-in {animation:fadeIn .4s ease-out forwards;}
+    @keyframes fadeIn {from {opacity:0;transform:translateY(10px);} to {opacity:1;transform:translateY(0);}}
   </style>
 </head>
 <body>
-  <!-- === PAGE LISTE === -->
+
+  <!-- === PAGE LISTE PRODUITS === -->
   <div id="listPage" class="fade-in">
     <header>
-      <h1 style="color:var(--yellow);margin:0;font-size:1.6rem;font-weight:700;">
-        Dry.Coffee76
-      </h1>
-      <p style="margin:0.4rem 0 0;font-size:0.9rem;color:#aaa;">
-        Produits naturels – Clique pour explorer
-      </p>
+      <img src="chat.jpg" alt="Logo Dry.Coffee76" class="logo">
+      <h1 style="color:var(--yellow);margin:0;font-size:1.6rem;font-weight:700;">Dry.Coffee76</h1>
+      <p style="margin:0.4rem 0 0;font-size:0.9rem;color:#aaa;">Produits naturels – Explore & commande</p>
     </header>
     <div class="container">
       <div class="grid" id="productsGrid"></div>
+
+      <div class="bottom-nav">
+        <button class="btn-links" id="goToLinks">Liens & Contacts</button>
+      </div>
     </div>
   </div>
 
   <!-- === PAGE DÉTAIL === -->
   <div id="detailPage">
     <header>
-      <button class="back-btn" id="backBtn">
-        Retour
-      </button>
+      <button class="back-btn" id="backBtnDetail">Retour</button>
       <h1 id="detailTitle" style="color:var(--yellow);margin:0;font-size:1.4rem;"></h1>
     </header>
     <div class="container">
@@ -158,13 +145,43 @@
       <p class="detail-desc" id="detailDesc"></p>
       <p class="detail-price" id="detailPrice"></p>
 
-      <!-- BOUTONS COMMANDE -->
       <div class="btn-group">
-        <a href="https://t.me/secretaire_Dry76" class="btn-command btn-tg" target="_blank">
-          Commander sur Telegram
+        <a href="https://t.me/secretaire_Dry76" class="btn-command btn-tg" target="_blank">Commander sur Telegram</a>
+        <a href="https://dympt.org/dry_coffee76" class="btn-command btn-potato" target="_blank">Commander sur Potato</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- === PAGE LIENS === -->
+  <div id="linksPage">
+    <header>
+      <button class="back-btn" id="backBtnLinks">Retour</button>
+      <h1 style="color:var(--yellow);margin:0;font-size:1.4rem;">Liens & Contacts</h1>
+    </header>
+    <div class="container">
+      <div class="links-grid">
+        <!-- Canal Telegram -->
+        <a href="https://t.me/+ReFc7y_qhoMzNWE8" class="link-card" target="_blank">
+          <div class="label">Canal Telegram</div>
+          <div class="desc">Rejoindre le groupe</div>
         </a>
-        <a href="https://dympt.org/dry_coffee76" class="btn-command btn-potato" target="_blank">
-          Commander sur Potato
+
+        <!-- Canal Potato -->
+        <a href="https://ptwdym158.org/joinchat/vlNUyjhhgWD8SfEaRTwUCQ" class="link-card" target="_blank">
+          <div class="label">Canal Potato</div>
+          <div class="desc">Rejoindre la communauté</div>
+        </a>
+
+        <!-- Contact Telegram -->
+        <a href="https://t.me/secretaire_Dry76" class="link-card" target="_blank">
+          <div class="label">Contact Telegram</div>
+          <div class="desc">@secretaire_Dry76</div>
+        </a>
+
+        <!-- Contact Potato -->
+        <a href="https://dympt.org/dry_coffee76" class="link-card" target="_blank">
+          <div class="label">Contact Potato</div>
+          <div class="desc">dry_coffee76</div>
         </a>
       </div>
     </div>
@@ -248,7 +265,6 @@
       const id = Number(card.dataset.id);
       currentProduct = catalogue.find(p => p.id === id);
 
-      // Remplir détail
       document.getElementById('detailTitle').textContent = currentProduct.name;
       document.getElementById('detailImg').src = currentProduct.img;
       document.getElementById('detailVideo').src = currentProduct.video;
@@ -256,14 +272,12 @@
       document.getElementById('detailPrice').textContent = 
         `${currentProduct.price.toFixed(2)} € ${currentProduct.unit ? `/ ${currentProduct.unit}` : ''}`;
 
-      // Reset média
       const video = document.getElementById('detailVideo');
       video.pause();
       video.style.display = 'none';
       document.getElementById('detailImg').style.display = 'block';
       document.querySelector('#mediaWrapper .play-icon').style.display = 'block';
 
-      // Animation + switch
       document.getElementById('detailPage').classList.add('fade-in');
       document.getElementById('listPage').style.display = 'none';
       document.getElementById('detailPage').style.display = 'block';
@@ -271,12 +285,18 @@
     });
 
     // ========================================
-    // 6. Bouton Retour
+    // 6. Boutons Retour
     // ========================================
-    document.getElementById('backBtn').addEventListener('click', () => {
+    document.getElementById('backBtnDetail').addEventListener('click', () => {
       document.getElementById('detailPage').style.display = 'none';
       document.getElementById('listPage').style.display = 'block';
       document.getElementById('detailPage').classList.remove('fade-in');
+      tg.MainButton.show();
+    });
+
+    document.getElementById('backBtnLinks').addEventListener('click', () => {
+      document.getElementById('linksPage').style.display = 'none';
+      document.getElementById('listPage').style.display = 'block';
       tg.MainButton.show();
     });
 
@@ -303,12 +323,23 @@
     });
 
     // ========================================
-    // 8. Bouton principal (facultatif)
+    // 8. Aller à la page Liens
+    // ========================================
+    document.getElementById('goToLinks').addEventListener('click', () => {
+      document.getElementById('listPage').style.display = 'none';
+      document.getElementById('linksPage').style.display = 'block';
+      tg.MainButton.hide();
+    });
+
+    // ========================================
+    // 9. Bouton principal
     // ========================================
     tg.MainButton.setText('Retour à la liste')
                 .onClick(() => {
                   if (document.getElementById('detailPage').style.display === 'block') {
-                    document.getElementById('backBtn').click();
+                    document.getElementById('backBtnDetail').click();
+                  } else if (document.getElementById('linksPage').style.display === 'block') {
+                    document.getElementById('backBtnLinks').click();
                   }
                 })
                 .show();
